@@ -226,7 +226,7 @@ def explain_memory(messages):
 def generate_summary(llm, messages):
     text = "\n".join(f"{r}: {c}" for r, c in messages[-10:])
     prompt = "Summarize this conversation in 3 bullet points:\n\n" + text
-    return llm.predict(prompt)
+    return llm.invoke([HumanMessage(content=prompt)]).content
 
 # --------------------------------------------------
 # LOAD USER CHATS
@@ -314,7 +314,7 @@ with st.sidebar:
 messages = get_messages(st.session_state.current_chat_id)
 
 llm = ChatGroq(
-    model="llama-3.1-8b-instant",
+    model="llama-3-1-8b-instant",
     temperature=0.3,
     streaming=True,
     api_key=os.getenv("GROQ_API_KEY")
