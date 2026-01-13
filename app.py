@@ -6,9 +6,9 @@ from dotenv import load_dotenv
 
 from langchain_groq import ChatGroq
 from langchain_core.messages import HumanMessage, AIMessage
-from langchain_community.memory.buffer import ConversationBufferMemory
-from langchain.chains.conversation.base import ConversationChain
 from langchain_core.callbacks.base import BaseCallbackHandler
+from langchain_core.runnables.history import RunnableWithMessageHistory
+from langchain_core.chat_history import InMemoryChatMessageHistory
 
 
 
@@ -313,21 +313,12 @@ with st.sidebar:
 # --------------------------------------------------
 messages = get_messages(st.session_state.current_chat_id)
 
-memory = ConversationBufferMemory()
-for role, content in messages:
-    if role == "user":
-        memory.chat_memory.add_message(HumanMessage(content=content))
-    else:
-        memory.chat_memory.add_message(AIMessage(content=content))
-
 llm = ChatGroq(
     model="llama-3.1-8b-instant",
     temperature=0.3,
     streaming=True,
     api_key=os.getenv("GROQ_API_KEY")
 )
-
-chatbot = ConversationChain(llm=llm, memory=memory)
 
 # --------------------------------------------------
 # MAIN UI
@@ -370,12 +361,27 @@ if isinstance(user_input, str) and user_input.strip():
         container = st.empty()
         handler = StreamHandler(container)
 
-        response = chatbot.predict(
-            input=user_input,
-            callbacks=[handler]
-        )
+        history = []
+        for role, content in messages:
+            if role == "user":
+                history.append(HumanMessage(content=content))
+            else:
+                history.append(AIMessage(content=content))
 
-    save_message(st.session_state.current_chat_id, "assistant", response)
+        # Add current user message
+        history.append(HumanMessage(content=user_input))
+
+        response = llm.invoke(
+            history,
+            callbacks=[handler]
+        ).content
+
+    # Save assistant message
+    save_message(
+        st.session_state.current_chat_id,
+        "assistant",
+        response
+    )
 
     # Transparency
     st.session_state.last_explanation = explain_memory(
