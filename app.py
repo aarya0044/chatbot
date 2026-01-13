@@ -3,13 +3,13 @@ import uuid
 import sqlite3
 import streamlit as st
 from dotenv import load_dotenv
-from langchain_core.messages import HumanMessage, AIMessage
 
 from langchain_groq import ChatGroq
 from langchain_core.messages import HumanMessage, AIMessage
-from langchain.memory.buffer import ConversationBufferMemory
+from langchain_community.memory import ConversationBufferMemory
 from langchain.chains.conversation.base import ConversationChain
 from langchain_core.callbacks.base import BaseCallbackHandler
+
 
 # --------------------------------------------------
 # ENV
