@@ -3,7 +3,7 @@ import uuid
 import sqlite3
 import streamlit as st
 from dotenv import load_dotenv
-from langchain.schema import HumanMessage, AIMessage
+from langchain_core.messages import HumanMessage, AIMessage
 
 from langchain_groq import ChatGroq
 from langchain.memory import ConversationBufferMemory
