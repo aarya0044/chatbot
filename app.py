@@ -372,10 +372,9 @@ if isinstance(user_input, str) and user_input.strip():
         history.append(HumanMessage(content=user_input))
 
         response = llm.invoke(
-            history,
-            callbacks=[handler]
+             history,
+             config={"callbacks": [handler]}
         ).content
-
     # Save assistant message
     save_message(
         st.session_state.current_chat_id,
