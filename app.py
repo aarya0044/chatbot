@@ -6,9 +6,10 @@ from dotenv import load_dotenv
 
 from langchain_groq import ChatGroq
 from langchain_core.messages import HumanMessage, AIMessage
-from langchain_community.memory import ConversationBufferMemory
+from langchain_community.memory.buffer import ConversationBufferMemory
 from langchain.chains.conversation.base import ConversationChain
 from langchain_core.callbacks.base import BaseCallbackHandler
+
 
 
 # --------------------------------------------------
