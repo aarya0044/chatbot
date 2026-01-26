@@ -1,4 +1,4 @@
-# 🤖 AI Chatbot with Persistent Memory
+#  AI Chatbot with Persistent Memory
 
 🔗 **Live App**: https://chatbot-00.streamlit.app/
 
@@ -6,36 +6,36 @@ A production-ready AI chatbot inspired by ChatGPT, built using **Streamlit** and
 
 ---
 
-## 🚀 Key Features
+##  Key Features
 
-- 💬 **Multi-Chat Conversations**
+-  **Multi-Chat Conversations**
   - Create, switch, rename, and delete chats
   - Chat titles auto-generated from the first user message (ChatGPT-style)
 
-- 🧠 **Persistent Memory (SQLite)**
+-  **Persistent Memory (SQLite)**
   - All conversations are stored and restored automatically
   - Chats remain available across sessions
 
-- ⚡ **Streaming AI Responses**
+-  **Streaming AI Responses**
   - Token-by-token streaming using Groq LLMs
   - Fast, real-time conversational experience
 
-- 🔍 **Transparency Mode**
+-  **Transparency Mode**
   - “Why did I remember this?” explanation
   - Shows which past user input influenced the response
 
-- 📝 **Automatic Chat Summaries**
+-  **Automatic Chat Summaries**
   - Periodic summarization of conversations
   - Stored per chat for future insights and enhancements
 
-- 🎨 **Clean Chat UI**
+-  **Clean Chat UI**
   - Sidebar chat navigation
   - Hover-based rename / delete options
   - Active chat title displayed in the main view
 
 ---
 
-## 🛠 Tech Stack
+##  Tech Stack
 
 - **Frontend**: Streamlit  
 - **LLM Provider**: Groq (`llama-3.1-8b-instant`)  
@@ -45,7 +45,7 @@ A production-ready AI chatbot inspired by ChatGPT, built using **Streamlit** and
 
 ---
 
-## 📁 Project Structure
+##  Project Structure
 
 Terminal Chatbot/
 ├── app.py # Main Streamlit application
@@ -57,7 +57,7 @@ Terminal Chatbot/
 
 ---
 
-## 🔮 Planned Enhancements
+##  Planned Enhancements
 
 - 🔐 OAuth authentication (Google / GitHub)
 - 🔗 Shareable chat links
@@ -67,4 +67,4 @@ Terminal Chatbot/
 
 ---
 
-> 💡 This project demonstrates real-world AI application development, including state management, persistence, streaming UX, and cloud deployment.
+>  This project demonstrates real-world AI application development, including state management, persistence, streaming UX, and cloud deployment.
