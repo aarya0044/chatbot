@@ -1,4 +1,7 @@
 venv/
+.venv/
 .env
 chatbot.db
 __pycache__/
+*.pyc
+eval/benchmark_results.json

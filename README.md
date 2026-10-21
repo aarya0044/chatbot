@@ -1,70 +1,134 @@
-#  AI Chatbot with Persistent Memory
+# TermiPilot ⚡
+### Autonomous AI DevOps & Terminal Copilot with Guardrailed Execution & Dual Interfaces
 
-🔗 **Live App**: https://chatbot-00.streamlit.app/
-
-A production-ready AI chatbot inspired by ChatGPT, built using **Streamlit** and **LangChain**, featuring **persistent multi-chat memory**, **streaming responses**, and **transparent memory explanations**.
-
----
-
-##  Key Features
-
--  **Multi-Chat Conversations**
-  - Create, switch, rename, and delete chats
-  - Chat titles auto-generated from the first user message (ChatGPT-style)
-
--  **Persistent Memory (SQLite)**
-  - All conversations are stored and restored automatically
-  - Chats remain available across sessions
-
--  **Streaming AI Responses**
-  - Token-by-token streaming using Groq LLMs
-  - Fast, real-time conversational experience
-
--  **Transparency Mode**
-  - “Why did I remember this?” explanation
-  - Shows which past user input influenced the response
-
--  **Automatic Chat Summaries**
-  - Periodic summarization of conversations
-  - Stored per chat for future insights and enhancements
-
--  **Clean Chat UI**
-  - Sidebar chat navigation
-  - Hover-based rename / delete options
-  - Active chat title displayed in the main view
+> **Academic Final Year Project (B.Tech / B.E. / BCA / BS)**  
+> *Domain: Agentic Artificial Intelligence, Systems Administration, and AI Safety*
 
 ---
 
-##  Tech Stack
+## 📖 Abstract
 
-- **Frontend**: Streamlit  
-- **LLM Provider**: Groq (`llama-3.1-8b-instant`)  
-- **Framework**: LangChain (Core APIs)  
-- **Database**: SQLite  
-- **Language**: Python  
+Traditional conversational chatbots rely solely on static pre-trained weights and cannot directly interact with, diagnose, or manage computational environments. When tasked with real-world developer problems (e.g., diagnosing build errors, inspecting system logs, querying network configurations), basic LLM wrappers often hallucinate commands or deliver outdated advice.
+
+**TermiPilot** is an autonomous, agentic terminal assistant that bridges natural language intent with real-time operating system execution. Powered by Groq's high-throughput LLM infrastructure, TermiPilot implements a **Reasoning + Acting (ReAct)** loop capable of invoking a suite of system tools (shell command execution, sandboxed Python computation, directory search, and live documentation retrieval). 
+
+To prevent accidental system disruption, TermiPilot incorporates a **Multi-Tier Safety Guardrail Engine** that automatically classifies commands into risk tiers (`SAFE`, `MODERATE`, `CRITICAL`, `BLOCKED`) and enforces **Human-in-the-Loop (HITL)** authorization before executing any mutating or destructive system action.
 
 ---
 
-##  Project Structure
+## 🏗️ System Architecture
 
+```
+                      ┌────────────────────────────────────────┐
+                      │            User Interfaces             │
+                      │   [Rich Terminal TUI]  [Streamlit Web] │
+                      └───────────────────┬────────────────────┘
+                                          │
+                                          ▼
+                      ┌────────────────────────────────────────┐
+                      │       Safety & Guardrails Layer        │
+                      │  • Prompt Injection Filter             │
+                      │  • Destructive Command Risk Classifier │
+                      │  • Human-in-the-Loop Approval Intercept│
+                      └───────────────────┬────────────────────┘
+                                          │
+                                          ▼
+                      ┌────────────────────────────────────────┐
+                      │        Agentic Orchestration           │
+                      │       (Groq High-Speed LLM)            │
+                      │     ReAct (Reason + Act Loop)          │
+                      └──────────────┬───────────────▲─────────┘
+                                     │               │
+                                     ▼               │ (Observations)
+                      ┌──────────────────────────────┴─────────┐
+                      │           Tool Execution Bus           │
+                      │  ├─ PowerShell / Shell Executor        │
+                      │  ├─ Sandboxed Python REPL              │
+                      │  ├─ File System Inspector (Grep/Tree)  │
+                      │  └─ DuckDuckGo Live Search API         │
+                      └──────────────┬─────────────────────────┘
+                                     │
+                                     ▼
+                      ┌────────────────────────────────────────┐
+                      │    Persistent Memory & Audit Store     │
+                      │        (SQLite: chatbot.db)            │
+                      │  • Session Threads  • Tool Audit Logs  │
+                      └────────────────────────────────────────┘
+```
+
+---
+
+## 🚀 Key Technical Highlights
+
+1. **Autonomous Tool Calling (ReAct Framework):**
+   - Implements closed-loop iteration: the agent diagnoses issues by running read-only diagnostic commands, analyzes the stdout/stderr, and iteratively resolves multi-step developer requests.
+2. **Tiered Safety & Human-in-the-Loop (HITL) Gate:**
+   - **`SAFE` (Auto-run):** `dir`, `Get-ChildItem`, `git status`, `python --version`, `cat`.
+   - **`MODERATE` (Gated):** `del`, `rm`, `kill`, `git reset --hard`, file overwrite redirection. Requires interactive user approval.
+   - **`BLOCKED` (Hard Deny):** Wildcard root deletion (`rm -rf /`, `del /f /s /q C:\`), fork bombs, system formatting.
+3. **Dual Interactive Frontends:**
+   - **Developer Terminal TUI (`cli_app.py`):** Built with `rich`, featuring live spinners, colorized tables, and interactive approval prompts.
+   - **Management Dashboard (`app.py`):** Built with `streamlit`, featuring live tool execution cards, multi-session management, and a compliance audit dashboard.
+4. **Full Traceability & Compliance Audit Trail:**
+   - Every single command, tool invocation, risk tier, duration, exit code, and stdout is persisted in SQLite for accountability.
+
+---
+
+## 🛠️ Project Structure
+
+```
 Terminal Chatbot/
-├── app.py # Main Streamlit application
-├── chatbot.db # SQLite database (auto-generated)
-├── requirements.txt # Dependencies
-├── README.md
-├── .env # Environment variables (not committed)
-└── .gitignore
+├── core/
+│   ├── agent.py            # ReAct orchestrator & Groq tool calling loop
+│   ├── memory.py           # SQLite persistence for chats & tool audit logs
+│   └── safety.py           # Risk assessment, regex classifier, and prompt guard
+├── tools/
+│   ├── system_tools.py     # Shell execution with timeout and output truncation
+│   ├── python_runner.py    # Sandboxed Python code evaluation
+│   ├── file_tools.py       # File reading, listing, and pattern searching
+│   └── web_tools.py        # Live search via DuckDuckGo
+├── eval/
+│   ├── benchmark_tasks.json# 7 reproducible benchmark test cases
+│   ├── run_benchmark.py    # Automated test runner measuring accuracy and latency
+│   └── benchmark_results.json# Exported evaluation metrics
+├── cli_app.py              # Interactive Rich Terminal User Interface (TUI)
+├── app.py                  # Streamlit Web UI & Metrics Dashboard
+├── requirements.txt        # Python package dependencies
+└── README.md               # Project documentation & viva guide
+```
 
 ---
 
-##  Planned Enhancements
+## ⚡ Quickstart Guide
 
-- 🔐 OAuth authentication (Google / GitHub)
-- 🔗 Shareable chat links
-- 📤 Export chats as PDF / Markdown
-- 🧠 Long-term memory per user
-- 📊 Usage analytics dashboard
+### 1. Prerequisites & Environment Setup
+Clone the repository and install the dependencies:
+```bash
+python -m venv venv
+.\venv\Scripts\activate
+pip install -r requirements.txt
+```
 
----
+Create a `.env` file in the root directory:
+```env
+GROQ_API_KEY=your_groq_api_key_here
+```
 
->  This project demonstrates real-world AI application development, including state management, persistence, streaming UX, and cloud deployment.
+### 2. Launch the Terminal Copilot (TUI)
+For an interactive command-line experience:
+```bash
+python cli_app.py
+```
+*Special commands:* `/history` (view audit log), `/clear` (clear screen), `exit` (quit).
+
+### 3. Launch the Web Dashboard
+For visual interaction, session management, and metrics:
+```bash
+streamlit run app.py
+```
+
+### 4. Run the Academic Evaluation Benchmark
+To generate the metrics and success rates for your project report:
+```bash
+python eval/run_benchmark.py
+```
