@@ -1,6 +1,7 @@
 """
 Memory and Database Persistence Layer for TermiPilot.
 Stores conversations, message history, and a full audit log of executed system tools.
+Includes automatic schema migrations for existing databases.
 """
 import sqlite3
 import uuid
@@ -61,6 +62,22 @@ class DatabaseManager:
             )
         """)
 
+        # Safe schema migration for pre-existing databases
+        try:
+            c.execute("PRAGMA table_info(chats)")
+            chat_cols = [col[1] for col in c.fetchall()]
+            if "created_at" not in chat_cols:
+                c.execute("ALTER TABLE chats ADD COLUMN created_at TEXT DEFAULT NULL")
+                c.execute("UPDATE chats SET created_at = datetime('now') WHERE created_at IS NULL")
+
+            c.execute("PRAGMA table_info(messages)")
+            msg_cols = [col[1] for col in c.fetchall()]
+            if "timestamp" not in msg_cols:
+                c.execute("ALTER TABLE messages ADD COLUMN timestamp TEXT DEFAULT NULL")
+                c.execute("UPDATE messages SET timestamp = datetime('now') WHERE timestamp IS NULL")
+        except Exception:
+            pass
+
         conn.commit()
         conn.close()
 
@@ -70,7 +87,7 @@ class DatabaseManager:
         conn = self.get_connection()
         c = conn.cursor()
         c.execute(
-            "INSERT INTO chats (chat_id, username, title, summary) VALUES (?, ?, ?, ?)",
+            "INSERT INTO chats (chat_id, username, title, summary, created_at) VALUES (?, ?, ?, ?, datetime('now'))",
             (chat_id, username, title, None)
         )
         conn.commit()
@@ -81,7 +98,7 @@ class DatabaseManager:
         conn = self.get_connection()
         c = conn.cursor()
         c.execute(
-            "SELECT chat_id, title, summary, created_at FROM chats WHERE username=? ORDER BY created_at DESC",
+            "SELECT chat_id, title, summary, created_at FROM chats WHERE username=? ORDER BY rowid DESC",
             (username,)
         )
         rows = c.fetchall()
@@ -112,7 +129,7 @@ class DatabaseManager:
         conn = self.get_connection()
         c = conn.cursor()
         c.execute(
-            "INSERT INTO messages (chat_id, role, content) VALUES (?, ?, ?)",
+            "INSERT INTO messages (chat_id, role, content, timestamp) VALUES (?, ?, ?, datetime('now'))",
             (chat_id, role, content)
         )
         conn.commit()
@@ -151,8 +168,8 @@ class DatabaseManager:
         c = conn.cursor()
         c.execute("""
             INSERT INTO tool_audit_logs
-            (chat_id, tool_name, command, risk_level, user_approved, exit_code, output, duration_ms)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            (chat_id, tool_name, command, risk_level, user_approved, exit_code, output, duration_ms, timestamp)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
         """, (
             chat_id,
             tool_name,
